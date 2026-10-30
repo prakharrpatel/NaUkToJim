@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pragati Patel</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        snap: '#FFFC00',
+                        snapDark: '#121212',
+                        snapCard: '#1E1E1E',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font Inter / Proxima-style -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b0b0b;
+            color: #ffffff;
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0b0b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333333;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #FFFC00;
+        }
+        /* Glassmorphism utility */
+        .snap-glass {
+            background: rgba(18, 18, 18, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        .snap-yellow-glow {
+            box-shadow: 0 0 20px rgba(255, 252, 0, 0.25);
+        }
+        /* Progress animation for stories */
+        @keyframes storyProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+        .animate-story {
+            animation: storyProgress 5s linear forwards;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-black text-white selection:bg-snap selection:text-black">
+
+    <!-- Snapchat-style Toast Container -->
+    <div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none w-full max-w-xs px-4"></div>
+
+    <!-- Minimal Snapchat Header -->
+    <header class="sticky top-0 z-30 snap-glass border-b border-white/5 py-3 px-4 sm:px-8">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <!-- Ghost Icon Branding -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-snap text-black flex items-center justify-center font-black text-xl shadow-lg snap-yellow-glow">
+                    <i class="fa-ghost fa-solid"></i>
+                </div>
+                <span class="font-extrabold text-xl tracking-tight hidden sm:inline text-white">Memories</span>
+            </div>
+
+            <!-- Filter Pills (Snapchat Style Tabs) -->
+            <div class="flex p-1 bg-white/10 backdrop-blur-md rounded-full border border-white/10">
+                <button data-filter="all" class="tab-btn px-4 py-1.5 rounded-full text-xs font-bold transition-all bg-snap text-black shadow-md">
+                    All
+                </button>
+                <button data-filter="image" class="tab-btn px-4 py-1.5 rounded-full text-xs font-bold transition-all text-white/70 hover:text-white">
+                    Photos
+                </button>
+                <button data-filter="video" class="tab-btn px-4 py-1.5 rounded-full text-xs font-bold transition-all text-white/70 hover:text-white">
+                    Videos
+                </button>
+            </div>
+
+            <!-- Quick Search Toggle Icon -->
+            <div class="flex items-center gap-2">
+                <div class="relative flex items-center">
+                    <input type="text" id="search-input" placeholder="Search..." class="w-28 sm:w-44 py-1.5 pl-8 pr-3 text-xs rounded-full bg-white/10 border border-white/10 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-snap focus:w-48 sm:focus:w-56 transition-all duration-300">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 text-white/40 text-xs"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Section -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 py-6 flex-grow w-full">
+
+        <!-- Loading State Skeleton -->
+        <div id="loading-state" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+            <template id="skeleton-template">
+                <div class="aspect-[9/16] rounded-3xl bg-white/5 animate-pulse border border-white/5"></div>
+            </template>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-state" class="hidden flex flex-col items-center justify-center py-20 text-center">
+            <div class="w-16 h-16 rounded-full bg-snap/10 text-snap flex items-center justify-center text-2xl mb-4 border border-snap/20">
+                <i class="fa-solid fa-circle-exclamation"></i>
+            </div>
+            <p id="error-message" class="text-sm font-semibold text-white/80 mb-4">Could not fetch memories.</p>
+            <button id="retry-btn" class="px-6 py-2.5 bg-snap text-black rounded-full text-xs font-extrabold transition hover:scale-105 active:scale-95 shadow-lg snap-yellow-glow">
+                Try Again
+            </button>
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden flex flex-col items-center justify-center py-24 text-center">
+            <i class="fa-ghost fa-solid text-5xl text-white/20 mb-3"></i>
+            <p class="text-sm font-bold text-white/60">No snaps found</p>
+        </div>
+
+        <!-- Snapchat Media Grid (9:16 Aspect ratio cards like Stories) -->
+        <div id="gallery-grid" class="hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+            <!-- Cards inserted dynamically -->
+        </div>
+    </main>
+
+    <!-- Fullscreen Snap Story Modal -->
+    <div id="story-modal" class="fixed inset-0 z-50 hidden bg-black flex flex-col justify-between p-0 sm:p-4 transition-opacity duration-200 opacity-0">
+        
+        <!-- Story Card Window -->
+        <div class="relative w-full h-full max-w-md mx-auto bg-snapDark sm:rounded-3xl overflow-hidden flex flex-col justify-between shadow-2xl border border-white/10">
+            
+            <!-- Top Progress Bar -->
+            <div class="absolute top-0 left-0 right-0 z-30 p-3 bg-gradient-to-b from-black/80 via-black/40 to-transparent flex flex-col gap-2">
+                <div class="w-full bg-white/30 h-1 rounded-full overflow-hidden">
+                    <div id="story-progress" class="bg-snap h-full w-0"></div>
+                </div>
+
+                <!-- Top Header Info & Actions -->
+                <div class="flex items-center justify-between pt-1">
+                    <div class="flex items-center gap-2">
+                        <div class="w-7 h-7 rounded-full bg-snap text-black flex items-center justify-center text-xs font-black">
+                            <i class="fa-ghost fa-solid"></i>
+                        </div>
+                        <span id="modal-title" class="text-xs font-bold text-white truncate max-w-[180px]">Snap</span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <button id="modal-download-btn" class="w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center text-xs backdrop-blur-md transition">
+                            <i class="fa-solid fa-download"></i>
+                        </button>
+                        <button id="modal-share-btn" class="w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center text-xs backdrop-blur-md transition">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                        <button id="modal-close-btn" class="w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center text-xs backdrop-blur-md transition">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tap Navigation zones -->
+            <div id="tap-prev" class="absolute left-0 top-16 bottom-20 w-1/3 z-20 cursor-pointer"></div>
+            <div id="tap-next" class="absolute right-0 top-16 bottom-20 w-2/3 z-20 cursor-pointer"></div>
+
+            <!-- Media Preview Area -->
+            <div class="w-full h-full flex items-center justify-center bg-black">
+                <img id="modal-image" class="hidden w-full h-full object-contain" src="" alt="Snap">
+                <video id="modal-video" class="hidden w-full h-full object-contain" playsinline autoplay>
+                    Your browser does not support videos.
+                </video>
+            </div>
+
+            <!-- Floating Bottom Action Bar -->
+            <div class="absolute bottom-4 left-4 right-4 z-30 flex items-center gap-2">
+                <button id="bottom-share-pill" class="flex-1 py-3 px-5 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-xl border border-white/20 text-white text-xs font-bold flex items-center justify-center gap-2 transition active:scale-95">
+                    <i class="fa-solid fa-share-nodes text-snap"></i> Share Snap
+                </button>
+                <button id="bottom-download-pill" class="w-11 h-11 rounded-full bg-snap text-black flex items-center justify-center text-sm font-black transition hover:scale-105 active:scale-95 shadow-lg snap-yellow-glow">
+                    <i class="fa-solid fa-arrow-down"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        const REPO_OWNER = 'prakharrpatel';
+        const REPO_NAME = 'NaUkToJim';
+        const API_URL = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents`;
+
+        const IMAGE_EXTS = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'];
+        const VIDEO_EXTS = ['mp4', 'webm', 'mov', 'ogg', 'm4v'];
+
+        let allMedia = [];
+        let filteredMedia = [];
+        let currentFilter = 'all';
+        let searchQuery = '';
+        let currentModalIndex = -1;
+
+        // Elements
+        const galleryGrid = document.getElementById('gallery-grid');
+        const loadingState = document.getElementById('loading-state');
+        const errorState = document.getElementById('error-state');
+        const emptyState = document.getElementById('empty-state');
+        const searchInput = document.getElementById('search-input');
+        const tabBtns = document.querySelectorAll('.tab-btn');
+
+        // Modal Elements
+        const storyModal = document.getElementById('story-modal');
+        const modalImage = document.getElementById('modal-image');
+        const modalVideo = document.getElementById('modal-video');
+        const modalTitle = document.getElementById('modal-title');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+        const modalDownloadBtn = document.getElementById('modal-download-btn');
+        const modalShareBtn = document.getElementById('modal-share-btn');
+        const bottomSharePill = document.getElementById('bottom-share-pill');
+        const bottomDownloadPill = document.getElementById('bottom-download-pill');
+        const tapPrev = document.getElementById('tap-prev');
+        const tapNext = document.getElementById('tap-next');
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderSkeletons();
+            fetchRepositoryMedia();
+            setupEvents();
+        });
+
+        // Skeleton Loader rendering
+        function renderSkeletons() {
+            loadingState.innerHTML = '';
+            for (let i = 0; i < 10; i++) {
+                const skeleton = document.getElementById('skeleton-template').content.cloneNode(true);
+                loadingState.appendChild(skeleton);
+            }
+        }
+
+        // Fetch media files from repository
+        async function fetchRepositoryMedia() {
+            try {
+                showLoading();
+                const res = await fetch(API_URL);
+                if (!res.ok) throw new Error('Failed to connect to media server');
+                const data = await res.json();
+
+                allMedia = [];
+                await parseDirectory(Array.isArray(data) ? data : [data]);
+
+                applyFilters();
+            } catch (err) {
+                showError(err.message);
+            }
+        }
+
+        // Parse items
+        async function parseDirectory(items) {
+            for (const item of items) {
+                if (item.type === 'file') {
+                    const ext = item.name.split('.').pop().toLowerCase();
+                    let type = null;
+
+                    if (IMAGE_EXTS.includes(ext)) type = 'image';
+                    else if (VIDEO_EXTS.includes(ext)) type = 'video';
+
+                    if (type) {
+                        allMedia.push({
+                            name: item.name,
+                            url: item.download_url,
+                            type: type,
+                        });
+                    }
+                } else if (item.type === 'dir') {
+                    try {
+                        const subRes = await fetch(item.url);
+                        if (subRes.ok) {
+                            const subData = await subRes.json();
+                            await parseDirectory(subData);
+                        }
+                    } catch (e) {}
+                }
+            }
+        }
+
+        // Apply Search & Category Filters
+        function applyFilters() {
+            filteredMedia = allMedia.filter(item => {
+                const matchesFilter = currentFilter === 'all' || item.type === currentFilter;
+                const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesFilter && matchesSearch;
+            });
+
+            renderGrid();
+        }
+
+        // Render Snapchat Card Grid
+        function renderGrid() {
+            loadingState.classList.add('hidden');
+            errorState.classList.add('hidden');
+
+            if (filteredMedia.length === 0) {
+                galleryGrid.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            galleryGrid.classList.remove('hidden');
+            galleryGrid.innerHTML = '';
+
+            filteredMedia.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'group relative aspect-[9/16] bg-snapDark rounded-3xl overflow-hidden cursor-pointer border border-white/10 hover:border-snap/50 transition-all duration-300 transform hover:-translate-y-1 shadow-lg';
+                card.onclick = () => openModal(index);
+
+                if (item.type === 'image') {
+                    card.innerHTML = `
+                        <img src="${item.url}" alt="${item.name}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80"></div>
+                        <div class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-md text-[10px] font-extrabold text-snap flex items-center gap-1 border border-white/10">
+                            <i class="fa-solid fa-camera"></i> PHOTO
+                        </div>
+                    `;
+                } else {
+                    card.innerHTML = `
+                        <video src="${item.url}" class="w-full h-full object-cover" muted loop preload="metadata"></video>
+                        <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80 flex items-center justify-center">
+                            <div class="w-10 h-10 rounded-full bg-snap/90 text-black flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-play text-xs ml-0.5"></i>
+                            </div>
+                        </div>
+                        <div class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-md text-[10px] font-extrabold text-snap flex items-center gap-1 border border-white/10">
+                            <i class="fa-solid fa-video"></i> VIDEO
+                        </div>
+                    `;
+                }
+
+                // Quick Action Buttons overlay on card
+                const actions = document.createElement('div');
+                actions.className = 'absolute bottom-3 left-3 right-3 flex items-center justify-between z-10';
+                actions.innerHTML = `
+                    <span class="text-xs font-bold text-white truncate max-w-[70%] drop-shadow">${item.name}</span>
+                    <div class="flex items-center gap-1.5">
+                        <button class="card-dl-btn w-7 h-7 rounded-full bg-white/20 hover:bg-snap hover:text-black text-white text-xs flex items-center justify-center backdrop-blur-md transition">
+                            <i class="fa-solid fa-download"></i>
+                        </button>
+                    </div>
+                `;
+
+                actions.querySelector('.card-dl-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    downloadMedia(item.url, item.name);
+                });
+
+                card.appendChild(actions);
+                galleryGrid.appendChild(card);
+            });
+        }
+
+        // Open Fullscreen Snap Story Modal
+        function openModal(index) {
+            if (index < 0 || index >= filteredMedia.length) return;
+            currentModalIndex = index;
+            const item = filteredMedia[index];
+
+            modalTitle.textContent = item.name;
+
+            if (item.type === 'image') {
+                modalVideo.pause();
+                modalVideo.classList.add('hidden');
+                modalImage.src = item.url;
+                modalImage.classList.remove('hidden');
+            } else {
+                modalImage.classList.add('hidden');
+                modalVideo.src = item.url;
+                modalVideo.classList.remove('hidden');
+                modalVideo.play().catch(() => {});
+            }
+
+            storyModal.classList.remove('hidden');
+            setTimeout(() => storyModal.classList.remove('opacity-0'), 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close Modal
+        function closeModal() {
+            storyModal.classList.add('opacity-0');
+            modalVideo.pause();
+            setTimeout(() => {
+                storyModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }, 200);
+        }
+
+        // Modal Next/Prev Navigation
+        function navModal(dir) {
+            let nextIdx = currentModalIndex + dir;
+            if (nextIdx < 0) nextIdx = filteredMedia.length - 1;
+            if (nextIdx >= filteredMedia.length) nextIdx = 0;
+            openModal(nextIdx);
+        }
+
+        // Media Download Function
+        async function downloadMedia(url, name) {
+            showToast('Downloading Snap...', 'snap');
+            try {
+                const res = await fetch(url);
+                const blob = await res.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = name;
+                document.body.appendChild(a);
+                a.click();
+                URL.revokeObjectURL(blobUrl);
+                a.remove();
+                showToast('Downloaded!', 'success');
+            } catch (e) {
+                window.open(url, '_blank');
+            }
+        }
+
+        // Media Share Function
+        async function shareMedia(item) {
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: item.name,
+                        url: item.url
+                    });
+                    showToast('Shared!', 'success');
+                } catch (e) {
+                    copyLink(item.url);
+                }
+            } else {
+                copyLink(item.url);
+            }
+        }
+
+        // Copy link to clipboard
+        function copyLink(text) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+                document.execCommand('copy');
+                showToast('Link copied to clipboard!', 'snap');
+            } catch (e) {
+                showToast('Failed to copy link', 'error');
+            }
+            ta.remove();
+        }
+
+        // Event Setup
+        function setupEvents() {
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    tabBtns.forEach(b => {
+                        b.classList.remove('bg-snap', 'text-black', 'shadow-md');
+                        b.classList.add('text-white/70');
+                    });
+                    btn.classList.add('bg-snap', 'text-black', 'shadow-md');
+                    btn.classList.remove('text-white/70');
+
+                    currentFilter = btn.dataset.filter;
+                    applyFilters();
+                });
+            });
+
+            searchInput.addEventListener('input', (e) => {
+                searchQuery = e.target.value;
+                applyFilters();
+            });
+
+            modalCloseBtn.addEventListener('click', closeModal);
+            tapPrev.addEventListener('click', () => navModal(-1));
+            tapNext.addEventListener('click', () => navModal(1));
+
+            modalDownloadBtn.addEventListener('click', () => downloadMedia(filteredMedia[currentModalIndex].url, filteredMedia[currentModalIndex].name));
+            bottomDownloadPill.addEventListener('click', () => downloadMedia(filteredMedia[currentModalIndex].url, filteredMedia[currentModalIndex].name));
+
+            modalShareBtn.addEventListener('click', () => shareMedia(filteredMedia[currentModalIndex]));
+            bottomSharePill.addEventListener('click', () => shareMedia(filteredMedia[currentModalIndex]));
+
+            document.addEventListener('keydown', (e) => {
+                if (storyModal.classList.contains('hidden')) return;
+                if (e.key === 'Escape') closeModal();
+                if (e.key === 'ArrowLeft') navModal(-1);
+                if (e.key === 'ArrowRight') navModal(1);
+            });
+
+            document.getElementById('retry-btn').addEventListener('click', fetchRepositoryMedia);
+        }
+
+        function showLoading() {
+            loadingState.classList.remove('hidden');
+            galleryGrid.classList.add('hidden');
+            errorState.classList.add('hidden');
+            emptyState.classList.add('hidden');
+        }
+
+        function showError(msg) {
+            loadingState.classList.add('hidden');
+            galleryGrid.classList.add('hidden');
+            document.getElementById('error-message').textContent = msg;
+            errorState.classList.remove('hidden');
+        }
+
+        // Snapchat Yellow Toast Notifications
+        function showToast(msg, type = 'snap') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+
+            let bgClass = 'bg-snap text-black shadow-snap-yellow-glow font-black';
+            if (type === 'success') bgClass = 'bg-emerald-400 text-black font-extrabold';
+            if (type === 'error') bgClass = 'bg-rose-500 text-white font-extrabold';
+
+            toast.className = `px-4 py-2.5 rounded-full text-xs text-center shadow-2xl transition-all duration-300 transform translate-y-[-10px] opacity-0 ${bgClass}`;
+            toast.textContent = msg;
+
+            container.appendChild(toast);
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-[-10px]', 'opacity-0');
+            });
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-[-10px]');
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
