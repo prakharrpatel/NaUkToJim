@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pragati Patel</title>
+    <title>Snap Media Gallery - NaUkToJim</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -12,8 +12,9 @@
                 extend: {
                     colors: {
                         snap: '#FFFC00',
-                        snapDark: '#121212',
-                        snapCard: '#1E1E1E',
+                        snapDark: '#0A0A0A',
+                        snapCard: '#18181B',
+                        snapBorder: '#27272A'
                     }
                 }
             }
@@ -21,68 +22,73 @@
     </script>
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Font Inter / Proxima-style -->
+    <!-- Google Font Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0b0b0b;
+            background-color: #050505;
             color: #ffffff;
             -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
-        /* Custom scrollbar */
+        /* Snapchat Scrollbar */
         ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+            width: 5px;
+            height: 5px;
         }
         ::-webkit-scrollbar-track {
-            background: #0b0b0b;
+            background: #050505;
         }
         ::-webkit-scrollbar-thumb {
-            background: #333333;
+            background: #27272a;
             border-radius: 9999px;
         }
         ::-webkit-scrollbar-thumb:hover {
             background: #FFFC00;
         }
-        /* Glassmorphism utility */
+        /* Snapchat Glow Effect */
+        .snap-glow {
+            box-shadow: 0 0 25px rgba(255, 252, 0, 0.25);
+        }
         .snap-glass {
-            background: rgba(18, 18, 18, 0.75);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
         }
-        .snap-yellow-glow {
-            box-shadow: 0 0 20px rgba(255, 252, 0, 0.25);
-        }
-        /* Progress animation for stories */
+        /* Story Progress Bar */
         @keyframes storyProgress {
-            0% { width: 0%; }
-            100% { width: 100%; }
+            from { width: 0%; }
+            to { width: 100%; }
         }
-        .animate-story {
-            animation: storyProgress 5s linear forwards;
+        .animate-progress {
+            animation: storyProgress linear forwards;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col bg-black text-white selection:bg-snap selection:text-black">
+<body class="min-h-screen flex flex-col bg-black text-white antialiased">
 
-    <!-- Snapchat-style Toast Container -->
+    <!-- Notification Toast -->
     <div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none w-full max-w-xs px-4"></div>
 
-    <!-- Minimal Snapchat Header -->
-    <header class="sticky top-0 z-30 snap-glass border-b border-white/5 py-3 px-4 sm:px-8">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <!-- Ghost Icon Branding -->
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-2xl bg-snap text-black flex items-center justify-center font-black text-xl shadow-lg snap-yellow-glow">
+    <!-- Snapchat Style Sticky Navigation -->
+    <header class="sticky top-0 z-30 snap-glass border-b border-white/10 px-4 py-3 sm:px-8">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            
+            <!-- Brand Badge -->
+            <div class="flex items-center gap-2.5">
+                <div class="w-10 h-10 rounded-2xl bg-snap text-black flex items-center justify-center font-black text-xl shadow-md snap-glow">
                     <i class="fa-ghost fa-solid"></i>
                 </div>
-                <span class="font-extrabold text-xl tracking-tight hidden sm:inline text-white">Memories</span>
+                <div class="hidden sm:block">
+                    <h1 class="text-sm font-extrabold tracking-tight text-white leading-none">NaUkToJim</h1>
+                    <span class="text-[10px] text-white/50 font-medium">prakharrpatel</span>
+                </div>
             </div>
 
-            <!-- Filter Pills (Snapchat Style Tabs) -->
-            <div class="flex p-1 bg-white/10 backdrop-blur-md rounded-full border border-white/10">
-                <button data-filter="all" class="tab-btn px-4 py-1.5 rounded-full text-xs font-bold transition-all bg-snap text-black shadow-md">
+            <!-- Snapchat Pill Tabs -->
+            <div class="flex p-1 bg-white/10 rounded-full border border-white/10 backdrop-blur-md">
+                <button data-filter="all" class="tab-btn px-4 py-1.5 rounded-full text-xs font-bold transition-all bg-snap text-black shadow-sm">
                     All
                 </button>
                 <button data-filter="image" class="tab-btn px-4 py-1.5 rounded-full text-xs font-bold transition-all text-white/70 hover:text-white">
@@ -93,109 +99,111 @@
                 </button>
             </div>
 
-            <!-- Quick Search Toggle Icon -->
-            <div class="flex items-center gap-2">
-                <div class="relative flex items-center">
-                    <input type="text" id="search-input" placeholder="Search..." class="w-28 sm:w-44 py-1.5 pl-8 pr-3 text-xs rounded-full bg-white/10 border border-white/10 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-snap focus:w-48 sm:focus:w-56 transition-all duration-300">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3 text-white/40 text-xs"></i>
-                </div>
+            <!-- Search Field -->
+            <div class="relative flex items-center">
+                <input type="text" id="search-input" placeholder="Search..." class="w-28 sm:w-44 py-1.5 pl-8 pr-3 text-xs rounded-full bg-white/10 border border-white/10 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-snap focus:w-48 sm:focus:w-56 transition-all duration-300">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 text-white/40 text-xs"></i>
             </div>
         </div>
     </header>
 
-    <!-- Main Section -->
+    <!-- Main Content Container -->
     <main class="max-w-7xl mx-auto px-3 sm:px-6 py-6 flex-grow w-full">
 
-        <!-- Loading State Skeleton -->
-        <div id="loading-state" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-            <template id="skeleton-template">
-                <div class="aspect-[9/16] rounded-3xl bg-white/5 animate-pulse border border-white/5"></div>
-            </template>
+        <!-- Loading Skeleton Grid -->
+        <div id="loading-state" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+            <script>
+                document.write(Array(10).fill(0).map(() => `
+                    <div class="aspect-[9/16] rounded-3xl bg-white/5 animate-pulse border border-white/5"></div>
+                `).join(''));
+            </script>
         </div>
 
         <!-- Error State -->
         <div id="error-state" class="hidden flex flex-col items-center justify-center py-20 text-center">
-            <div class="w-16 h-16 rounded-full bg-snap/10 text-snap flex items-center justify-center text-2xl mb-4 border border-snap/20">
-                <i class="fa-solid fa-circle-exclamation"></i>
+            <div class="w-14 h-14 rounded-full bg-snap/10 text-snap flex items-center justify-center text-xl mb-3 border border-snap/20">
+                <i class="fa-solid fa-triangle-exclamation"></i>
             </div>
-            <p id="error-message" class="text-sm font-semibold text-white/80 mb-4">Could not fetch memories.</p>
-            <button id="retry-btn" class="px-6 py-2.5 bg-snap text-black rounded-full text-xs font-extrabold transition hover:scale-105 active:scale-95 shadow-lg snap-yellow-glow">
-                Try Again
+            <p id="error-message" class="text-xs font-semibold text-white/80 mb-4">Unable to load media from repository.</p>
+            <button id="retry-btn" class="px-5 py-2 bg-snap text-black rounded-full text-xs font-black hover:scale-105 active:scale-95 transition shadow-lg snap-glow">
+                Retry Fetch
             </button>
         </div>
 
         <!-- Empty State -->
         <div id="empty-state" class="hidden flex flex-col items-center justify-center py-24 text-center">
-            <i class="fa-ghost fa-solid text-5xl text-white/20 mb-3"></i>
-            <p class="text-sm font-bold text-white/60">No snaps found</p>
+            <i class="fa-ghost fa-solid text-4xl text-white/20 mb-3"></i>
+            <p class="text-xs font-bold text-white/50">No media found in repository</p>
         </div>
 
-        <!-- Snapchat Media Grid (9:16 Aspect ratio cards like Stories) -->
+        <!-- Snapchat Visual Media Grid -->
         <div id="gallery-grid" class="hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
-            <!-- Cards inserted dynamically -->
+            <!-- Dynamic cards inject here -->
         </div>
     </main>
 
-    <!-- Fullscreen Snap Story Modal -->
+    <!-- Fullscreen Story / Lightbox Modal -->
     <div id="story-modal" class="fixed inset-0 z-50 hidden bg-black flex flex-col justify-between p-0 sm:p-4 transition-opacity duration-200 opacity-0">
         
-        <!-- Story Card Window -->
+        <!-- Story Viewport Container -->
         <div class="relative w-full h-full max-w-md mx-auto bg-snapDark sm:rounded-3xl overflow-hidden flex flex-col justify-between shadow-2xl border border-white/10">
             
-            <!-- Top Progress Bar -->
+            <!-- Top Overlay Controls & Story Progress -->
             <div class="absolute top-0 left-0 right-0 z-30 p-3 bg-gradient-to-b from-black/80 via-black/40 to-transparent flex flex-col gap-2">
+                
+                <!-- Story Bar -->
                 <div class="w-full bg-white/30 h-1 rounded-full overflow-hidden">
-                    <div id="story-progress" class="bg-snap h-full w-0"></div>
+                    <div id="story-progress-bar" class="bg-snap h-full w-0"></div>
                 </div>
 
-                <!-- Top Header Info & Actions -->
+                <!-- Header Actions -->
                 <div class="flex items-center justify-between pt-1">
                     <div class="flex items-center gap-2">
                         <div class="w-7 h-7 rounded-full bg-snap text-black flex items-center justify-center text-xs font-black">
                             <i class="fa-ghost fa-solid"></i>
                         </div>
-                        <span id="modal-title" class="text-xs font-bold text-white truncate max-w-[180px]">Snap</span>
+                        <span id="modal-title" class="text-xs font-bold text-white truncate max-w-[170px]">Media Snap</span>
                     </div>
 
-                    <div class="flex items-center gap-2">
-                        <button id="modal-download-btn" class="w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center text-xs backdrop-blur-md transition">
-                            <i class="fa-solid fa-download"></i>
+                    <div class="flex items-center gap-1.5">
+                        <button id="modal-download-btn" title="Download" class="w-8 h-8 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center text-xs backdrop-blur-md transition border border-white/10">
+                            <i class="fa-solid fa-arrow-down"></i>
                         </button>
-                        <button id="modal-share-btn" class="w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center text-xs backdrop-blur-md transition">
+                        <button id="modal-share-btn" title="Share" class="w-8 h-8 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center text-xs backdrop-blur-md transition border border-white/10">
                             <i class="fa-solid fa-paper-plane"></i>
                         </button>
-                        <button id="modal-close-btn" class="w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center text-xs backdrop-blur-md transition">
+                        <button id="modal-close-btn" title="Close" class="w-8 h-8 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center text-xs backdrop-blur-md transition border border-white/10">
                             <i class="fa-solid fa-xmark"></i>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Tap Navigation zones -->
+            <!-- Tap Navigation Zones -->
             <div id="tap-prev" class="absolute left-0 top-16 bottom-20 w-1/3 z-20 cursor-pointer"></div>
             <div id="tap-next" class="absolute right-0 top-16 bottom-20 w-2/3 z-20 cursor-pointer"></div>
 
-            <!-- Media Preview Area -->
+            <!-- Media Content Stage -->
             <div class="w-full h-full flex items-center justify-center bg-black">
-                <img id="modal-image" class="hidden w-full h-full object-contain" src="" alt="Snap">
+                <img id="modal-image" class="hidden w-full h-full object-contain" src="" alt="Snap Preview">
                 <video id="modal-video" class="hidden w-full h-full object-contain" playsinline autoplay>
-                    Your browser does not support videos.
+                    Your browser does not support HTML5 video.
                 </video>
             </div>
 
-            <!-- Floating Bottom Action Bar -->
+            <!-- Bottom Floating Action Bar -->
             <div class="absolute bottom-4 left-4 right-4 z-30 flex items-center gap-2">
-                <button id="bottom-share-pill" class="flex-1 py-3 px-5 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-xl border border-white/20 text-white text-xs font-bold flex items-center justify-center gap-2 transition active:scale-95">
+                <button id="bottom-share-pill" class="flex-1 py-3 px-5 rounded-full bg-white/15 hover:bg-white/25 backdrop-blur-xl border border-white/20 text-white text-xs font-bold flex items-center justify-center gap-2 transition active:scale-95">
                     <i class="fa-solid fa-share-nodes text-snap"></i> Share Snap
                 </button>
-                <button id="bottom-download-pill" class="w-11 h-11 rounded-full bg-snap text-black flex items-center justify-center text-sm font-black transition hover:scale-105 active:scale-95 shadow-lg snap-yellow-glow">
-                    <i class="fa-solid fa-arrow-down"></i>
+                <button id="bottom-download-pill" class="w-11 h-11 rounded-full bg-snap text-black flex items-center justify-center text-sm font-black transition hover:scale-105 active:scale-95 shadow-lg snap-glow">
+                    <i class="fa-solid fa-download"></i>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- JavaScript Logic -->
+    <!-- Application Script -->
     <script>
         const REPO_OWNER = 'prakharrpatel';
         const REPO_NAME = 'NaUkToJim';
@@ -209,6 +217,7 @@
         let currentFilter = 'all';
         let searchQuery = '';
         let currentModalIndex = -1;
+        let storyTimer = null;
 
         // Elements
         const galleryGrid = document.getElementById('gallery-grid');
@@ -228,75 +237,70 @@
         const modalShareBtn = document.getElementById('modal-share-btn');
         const bottomSharePill = document.getElementById('bottom-share-pill');
         const bottomDownloadPill = document.getElementById('bottom-download-pill');
+        const progressBar = document.getElementById('story-progress-bar');
         const tapPrev = document.getElementById('tap-prev');
         const tapNext = document.getElementById('tap-next');
 
         window.addEventListener('DOMContentLoaded', () => {
-            renderSkeletons();
             fetchRepositoryMedia();
-            setupEvents();
+            setupEventListeners();
         });
 
-        // Skeleton Loader rendering
-        function renderSkeletons() {
-            loadingState.innerHTML = '';
-            for (let i = 0; i < 10; i++) {
-                const skeleton = document.getElementById('skeleton-template').content.cloneNode(true);
-                loadingState.appendChild(skeleton);
-            }
-        }
-
-        // Fetch media files from repository
+        // Recursively Fetch GitHub Contents
         async function fetchRepositoryMedia() {
+            showLoading();
+            allMedia = [];
             try {
-                showLoading();
-                const res = await fetch(API_URL);
-                if (!res.ok) throw new Error('Failed to connect to media server');
-                const data = await res.json();
-
-                allMedia = [];
-                await parseDirectory(Array.isArray(data) ? data : [data]);
-
-                applyFilters();
+                await recursiveFetchContents(API_URL);
+                if (allMedia.length === 0) {
+                    showEmpty();
+                } else {
+                    applyFilters();
+                }
             } catch (err) {
-                showError(err.message);
+                showError(err.message || 'Error connecting to GitHub repository');
             }
         }
 
-        // Parse items
-        async function parseDirectory(items) {
+        async function recursiveFetchContents(url) {
+            const response = await fetch(url);
+            if (!response.ok) {
+                if (response.status === 403) {
+                    throw new Error('GitHub API rate limit reached. Please try again later.');
+                }
+                throw new Error('Failed to fetch contents from repository');
+            }
+            const contents = await response.json();
+            const items = Array.isArray(contents) ? contents : [contents];
+
             for (const item of items) {
                 if (item.type === 'file') {
                     const ext = item.name.split('.').pop().toLowerCase();
-                    let type = null;
+                    let mediaType = null;
 
-                    if (IMAGE_EXTS.includes(ext)) type = 'image';
-                    else if (VIDEO_EXTS.includes(ext)) type = 'video';
+                    if (IMAGE_EXTS.includes(ext)) mediaType = 'image';
+                    else if (VIDEO_EXTS.includes(ext)) mediaType = 'video';
 
-                    if (type) {
+                    if (mediaType) {
                         allMedia.push({
                             name: item.name,
-                            url: item.download_url,
-                            type: type,
+                            path: item.path,
+                            url: item.download_url || `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/${item.path}`,
+                            type: mediaType
                         });
                     }
                 } else if (item.type === 'dir') {
-                    try {
-                        const subRes = await fetch(item.url);
-                        if (subRes.ok) {
-                            const subData = await subRes.json();
-                            await parseDirectory(subData);
-                        }
-                    } catch (e) {}
+                    await recursiveFetchContents(item.url);
                 }
             }
         }
 
-        // Apply Search & Category Filters
+        // Apply Search & Filter Tabs
         function applyFilters() {
             filteredMedia = allMedia.filter(item => {
                 const matchesFilter = currentFilter === 'all' || item.type === currentFilter;
-                const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
+                const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                      item.path.toLowerCase().includes(searchQuery.toLowerCase());
                 return matchesFilter && matchesSearch;
             });
 
@@ -320,14 +324,14 @@
 
             filteredMedia.forEach((item, index) => {
                 const card = document.createElement('div');
-                card.className = 'group relative aspect-[9/16] bg-snapDark rounded-3xl overflow-hidden cursor-pointer border border-white/10 hover:border-snap/50 transition-all duration-300 transform hover:-translate-y-1 shadow-lg';
+                card.className = 'group relative aspect-[9/16] bg-snapCard rounded-3xl overflow-hidden cursor-pointer border border-snapBorder hover:border-snap/60 transition-all duration-300 transform hover:-translate-y-1 shadow-lg';
                 card.onclick = () => openModal(index);
 
                 if (item.type === 'image') {
                     card.innerHTML = `
                         <img src="${item.url}" alt="${item.name}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80"></div>
-                        <div class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-md text-[10px] font-extrabold text-snap flex items-center gap-1 border border-white/10">
+                        <div class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-extrabold text-snap flex items-center gap-1 border border-white/10">
                             <i class="fa-solid fa-camera"></i> PHOTO
                         </div>
                     `;
@@ -335,102 +339,127 @@
                     card.innerHTML = `
                         <video src="${item.url}" class="w-full h-full object-cover" muted loop preload="metadata"></video>
                         <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80 flex items-center justify-center">
-                            <div class="w-10 h-10 rounded-full bg-snap/90 text-black flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                            <div class="w-10 h-10 rounded-full bg-snap text-black flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                                 <i class="fa-solid fa-play text-xs ml-0.5"></i>
                             </div>
                         </div>
-                        <div class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-md text-[10px] font-extrabold text-snap flex items-center gap-1 border border-white/10">
+                        <div class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-extrabold text-snap flex items-center gap-1 border border-white/10">
                             <i class="fa-solid fa-video"></i> VIDEO
                         </div>
                     `;
                 }
 
-                // Quick Action Buttons overlay on card
-                const actions = document.createElement('div');
-                actions.className = 'absolute bottom-3 left-3 right-3 flex items-center justify-between z-10';
-                actions.innerHTML = `
-                    <span class="text-xs font-bold text-white truncate max-w-[70%] drop-shadow">${item.name}</span>
-                    <div class="flex items-center gap-1.5">
-                        <button class="card-dl-btn w-7 h-7 rounded-full bg-white/20 hover:bg-snap hover:text-black text-white text-xs flex items-center justify-center backdrop-blur-md transition">
-                            <i class="fa-solid fa-download"></i>
-                        </button>
-                    </div>
+                // Hover Actions Container
+                const cardOverlay = document.createElement('div');
+                cardOverlay.className = 'absolute bottom-3 left-3 right-3 flex items-center justify-between z-10';
+                cardOverlay.innerHTML = `
+                    <span class="text-xs font-bold text-white truncate max-w-[70%] drop-shadow-md">${item.name}</span>
+                    <button class="card-dl-btn w-8 h-8 rounded-full bg-white/20 hover:bg-snap hover:text-black text-white text-xs flex items-center justify-center backdrop-blur-md transition border border-white/10">
+                        <i class="fa-solid fa-arrow-down"></i>
+                    </button>
                 `;
 
-                actions.querySelector('.card-dl-btn').addEventListener('click', (e) => {
+                cardOverlay.querySelector('.card-dl-btn').addEventListener('click', (e) => {
                     e.stopPropagation();
                     downloadMedia(item.url, item.name);
                 });
 
-                card.appendChild(actions);
+                card.appendChild(cardOverlay);
                 galleryGrid.appendChild(card);
             });
         }
 
-        // Open Fullscreen Snap Story Modal
+        // Story Lightbox Modal Logic
         function openModal(index) {
             if (index < 0 || index >= filteredMedia.length) return;
             currentModalIndex = index;
             const item = filteredMedia[index];
 
             modalTitle.textContent = item.name;
+            resetStoryProgress();
 
             if (item.type === 'image') {
                 modalVideo.pause();
                 modalVideo.classList.add('hidden');
                 modalImage.src = item.url;
                 modalImage.classList.remove('hidden');
+                startStoryProgress(5000); // 5s for image stories
             } else {
                 modalImage.classList.add('hidden');
                 modalVideo.src = item.url;
                 modalVideo.classList.remove('hidden');
-                modalVideo.play().catch(() => {});
+                modalVideo.currentTime = 0;
+                
+                modalVideo.play().then(() => {
+                    const duration = (modalVideo.duration && !isNaN(modalVideo.duration)) ? modalVideo.duration * 1000 : 8000;
+                    startStoryProgress(duration);
+                }).catch(() => {
+                    startStoryProgress(5000);
+                });
+
+                modalVideo.onended = () => navModal(1);
             }
 
             storyModal.classList.remove('hidden');
-            setTimeout(() => storyModal.classList.remove('opacity-0'), 10);
+            requestAnimationFrame(() => storyModal.classList.remove('opacity-0'));
             document.body.style.overflow = 'hidden';
         }
 
-        // Close Modal
         function closeModal() {
             storyModal.classList.add('opacity-0');
             modalVideo.pause();
+            resetStoryProgress();
             setTimeout(() => {
                 storyModal.classList.add('hidden');
                 document.body.style.overflow = '';
             }, 200);
         }
 
-        // Modal Next/Prev Navigation
         function navModal(dir) {
-            let nextIdx = currentModalIndex + dir;
-            if (nextIdx < 0) nextIdx = filteredMedia.length - 1;
-            if (nextIdx >= filteredMedia.length) nextIdx = 0;
-            openModal(nextIdx);
+            let nextIndex = currentModalIndex + dir;
+            if (nextIndex < 0) nextIndex = filteredMedia.length - 1;
+            if (nextIndex >= filteredMedia.length) nextIndex = 0;
+            openModal(nextIndex);
         }
 
-        // Media Download Function
-        async function downloadMedia(url, name) {
-            showToast('Downloading Snap...', 'snap');
+        function startStoryProgress(durationMs) {
+            resetStoryProgress();
+            progressBar.style.transition = `width ${durationMs}ms linear`;
+            requestAnimationFrame(() => {
+                progressBar.style.width = '100%';
+            });
+            storyTimer = setTimeout(() => {
+                navModal(1);
+            }, durationMs);
+        }
+
+        function resetStoryProgress() {
+            clearTimeout(storyTimer);
+            progressBar.style.transition = 'none';
+            progressBar.style.width = '0%';
+        }
+
+        // Direct Download via Fetch Blob
+        async function downloadMedia(url, filename) {
+            showToast('Starting download...', 'snap');
             try {
                 const res = await fetch(url);
                 const blob = await res.blob();
                 const blobUrl = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = blobUrl;
-                a.download = name;
+                a.download = filename;
                 document.body.appendChild(a);
                 a.click();
                 URL.revokeObjectURL(blobUrl);
                 a.remove();
-                showToast('Downloaded!', 'success');
+                showToast('Download complete!', 'success');
             } catch (e) {
                 window.open(url, '_blank');
             }
         }
 
-        // Media Share Function
+        // Web Share API with Fallback
         async function shareMedia(item) {
             if (navigator.share) {
                 try {
@@ -438,17 +467,16 @@
                         title: item.name,
                         url: item.url
                     });
-                    showToast('Shared!', 'success');
+                    showToast('Shared successfully!', 'success');
                 } catch (e) {
-                    copyLink(item.url);
+                    if (e.name !== 'AbortError') copyToClipboard(item.url);
                 }
             } else {
-                copyLink(item.url);
+                copyToClipboard(item.url);
             }
         }
 
-        // Copy link to clipboard
-        function copyLink(text) {
+        function copyToClipboard(text) {
             const ta = document.createElement('textarea');
             ta.value = text;
             ta.style.position = 'fixed';
@@ -465,14 +493,14 @@
         }
 
         // Event Setup
-        function setupEvents() {
+        function setupEventListeners() {
             tabBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
                     tabBtns.forEach(b => {
-                        b.classList.remove('bg-snap', 'text-black', 'shadow-md');
+                        b.classList.remove('bg-snap', 'text-black', 'shadow-sm');
                         b.classList.add('text-white/70');
                     });
-                    btn.classList.add('bg-snap', 'text-black', 'shadow-md');
+                    btn.classList.add('bg-snap', 'text-black', 'shadow-sm');
                     btn.classList.remove('text-white/70');
 
                     currentFilter = btn.dataset.filter;
@@ -512,21 +540,28 @@
             emptyState.classList.add('hidden');
         }
 
+        function showEmpty() {
+            loadingState.classList.add('hidden');
+            galleryGrid.classList.add('hidden');
+            errorState.classList.add('hidden');
+            emptyState.classList.remove('hidden');
+        }
+
         function showError(msg) {
             loadingState.classList.add('hidden');
             galleryGrid.classList.add('hidden');
+            emptyState.classList.add('hidden');
             document.getElementById('error-message').textContent = msg;
             errorState.classList.remove('hidden');
         }
 
-        // Snapchat Yellow Toast Notifications
         function showToast(msg, type = 'snap') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
 
-            let bgClass = 'bg-snap text-black shadow-snap-yellow-glow font-black';
-            if (type === 'success') bgClass = 'bg-emerald-400 text-black font-extrabold';
-            if (type === 'error') bgClass = 'bg-rose-500 text-white font-extrabold';
+            let bgClass = 'bg-snap text-black font-black snap-glow';
+            if (type === 'success') bgClass = 'bg-emerald-400 text-black font-black';
+            if (type === 'error') bgClass = 'bg-rose-500 text-white font-black';
 
             toast.className = `px-4 py-2.5 rounded-full text-xs text-center shadow-2xl transition-all duration-300 transform translate-y-[-10px] opacity-0 ${bgClass}`;
             toast.textContent = msg;
